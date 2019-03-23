@@ -23,6 +23,7 @@ WebServer webServer(80);
 // wifi config store
 Preferences preferences;
 
+
 void setup() {
   m5.begin();
   preferences.begin("wifi-config");
@@ -37,12 +38,14 @@ void setup() {
   }
   settingMode = true;
   setupMode();
+
 }
 
 void loop() {
   if (settingMode) {
   }
   webServer.handleClient();
+
 }
 
 boolean restoreConfig() {
@@ -85,6 +88,30 @@ boolean checkConnection() {
   Serial.println("Timed out.");
   M5.Lcd.println("Timed out.");
   return false;
+}
+
+String payload(String api_url){
+  try
+    {
+      HTTPClient http;
+      http.begin(api_url);
+      int httpCode = http.GET();                                        //Make the request
+
+      if (httpCode > 0) { //Check for the returning code
+        M5.Lcd.println("PAYLOAD");
+        String payload = http.getString();
+        return payload;
+      }
+      else {
+        M5.Lcd.print("Error on HTTP request");
+      }
+
+      http.end(); //Free the resources
+    }
+    catch (...)
+    {
+      M5.Lcd.print("Get Data Error");
+    }
 }
 
 void startWebServer() {
@@ -140,60 +167,13 @@ void startWebServer() {
     Serial.println(WiFi.localIP());
     M5.Lcd.println(WiFi.localIP());
 
+    String api_url = "https://api.etherscan.io/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=NQCE1PBYQ4G3BVUENV2A1H8KVQ1AC81Z5U";
+    String payload_str = payload(api_url);  
+    M5.Lcd.println(payload_str);
 
-
-    try
-    {
-      HTTPClient http;
-//      http.begin("https://exwd.csie.org/eth/eth-realtime"); //Specify the URL
-      String api_url = "https://api.etherscan.io/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=NQCE1PBYQ4G3BVUENV2A1H8KVQ1AC81Z5U";
-      http.begin(api_url);
-      int httpCode = http.GET();                                        //Make the request
-
-      if (httpCode > 0) { //Check for the returning code
-        M5.Lcd.println("PAYLOAD");
-        String payload = http.getString();
-        M5.Lcd.println(payload);
-
-        
-        //M5.Lcd.drawCentreString(payload, 0, 50, 4);
-//        JsonParser<32> parser;
-//        // Length (with one extra character for the null terminator)
-//        int str_len = payload.length() + 1; 
-//        char char_array[str_len];
-//
-//        payload.toCharArray(char_array, str_len);
-//        JsonHashTable hashTable = parser.parseHashTable(char_array);
-//        if (!hashTable.success())
-//        {
-//             M5.Lcd.print("PARSE ERROR !!");
-//              M5.Lcd.print(payload);
-//        }
-//
-//        char* price = hashTable.getString("formatted_sell_price");
-//        M5.Lcd.drawCentreString(String(price), 0, 50, 4);
-      }
-      api_url = "https://api.blockcypher.com/v1/btc/main/addrs/1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD/balance";
-      http.begin(api_url);
-      httpCode = http.GET();                                        //Make the request
-
-      if (httpCode > 0) { //Check for the returning code
-        M5.Lcd.println("PAYLOAD BTC");
-        String payload = http.getString();
-        M5.Lcd.println(payload);
-      }      
-
-      else {
-        M5.Lcd.print("Error on HTTP request");
-      }
-
-      http.end(); //Free the resources
-    }
-    catch (...)
-    {
-      M5.Lcd.print("Get Data Error");
-    }
-
+    String api_url_btc = "https://api.blockcypher.com/v1/btc/main/addrs/1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD/balance";
+    String payload_str_btc = payload(api_url_btc); 
+    M5.Lcd.println(payload_str_btc);
 
     webServer.on("/", []() {
       String s = "<h1>當麻控制模式</h1><p><a href=\"/reset\">重設Wifi</a></p>";
