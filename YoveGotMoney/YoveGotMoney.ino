@@ -17,7 +17,7 @@ Avatar avatar;
 //#include <JsonParser.h>
 
 const IPAddress apIP(192, 168, 1, 196);
-const char* apSSID = "M5STACK_SETUP";
+const char* apSSID = "MAGNITIK";
 boolean settingMode;
 String ssidList;
 String wifi_ssid;
@@ -28,7 +28,6 @@ WebServer webServer(80);
 
 // wifi config store
 Preferences preferences;
-
 
 void setup() {
   M5.begin();
@@ -61,20 +60,16 @@ void sayBaloon(String aStupidWasteOfResource){
   aStupidWasteOfResource.toCharArray(str, 50);
   avatar.setSpeechText(str);
   avatar.setMouthOpenRatio(0.7);
-  delay(200);
+  delay(1000);
   avatar.setMouthOpenRatio(0);
 }
 
 boolean restoreConfig() {
   wifi_ssid = preferences.getString("WIFI_SSID");
   wifi_password = preferences.getString("WIFI_PASSWD");
-  Serial.print("WIFI-SSID: ");
   sayBaloon("WIFI-SSID: ");
-  Serial.println(wifi_ssid);
   sayBaloon(wifi_ssid);
-  Serial.print("WIFI-PASSWD: ");
   sayBaloon("WIFI-PASSWD: ");
-  Serial.println(wifi_password);
   sayBaloon(wifi_password);
   WiFi.begin(wifi_ssid.c_str(), wifi_password.c_str());
 
@@ -87,7 +82,6 @@ boolean restoreConfig() {
 
 boolean checkConnection() {
   int count = 0;
-  Serial.print("Waiting for Wi-Fi connection");
   sayBaloon("Waiting for Wi-Fi connection");
   while ( count < 30 ) {
     if (WiFi.status() == WL_CONNECTED) {
@@ -96,7 +90,6 @@ boolean checkConnection() {
       return (true);
     }
     delay(500);
-    Serial.print(".");
     sayBaloon(".");
     count++;
   }
@@ -139,9 +132,7 @@ String IpAddress2String(const IPAddress& ipAddress)
 
 void startWebServer() {
   if (settingMode) {
-    Serial.print("Starting Web Server at ");
-    sayBaloon("Starting Web Server at ");
-    Serial.println(WiFi.softAPIP());
+    sayBaloon("Web Serv at ");
     sayBaloon(IpAddress2String(WiFi.softAPIP()));
     webServer.on("/settings", []() {
       String s = "<h1>Wi-Fi Settings</h1><p>Please enter your password by selecting the SSID.</p>";
@@ -152,26 +143,19 @@ void startWebServer() {
     });
     webServer.on("/setap", []() {
       String ssid = urlDecode(webServer.arg("ssid"));
-      Serial.print("SSID: ");
       sayBaloon("SSID: ");
-      Serial.println(ssid);
       sayBaloon(ssid);
       String pass = urlDecode(webServer.arg("pass"));
-      Serial.print("Password: ");
       sayBaloon("Password: ");
-      Serial.println(pass);
       sayBaloon(pass);
-      Serial.println("Writing SSID to EEPROM...");
-      sayBaloon("Writing SSID to EEPROM...");
+      sayBaloon("SSID...");
 
       // Store wifi config
-      Serial.println("Writing Password to nvr...");
-      sayBaloon("Writing Password to nvr...");
+      sayBaloon("Pass to nvr...");
       preferences.putString("WIFI_SSID", ssid);
       preferences.putString("WIFI_PASSWD", pass);
 
-      Serial.println("Write nvr done!");
-      sayBaloon("Write nvr done!");
+      sayBaloon("nvr done!");
       String s = "<h1>Setup complete.</h1><p>device will be connected to \"";
       s += ssid;
       s += "\" after the restart.";
@@ -185,9 +169,7 @@ void startWebServer() {
     });
   }
   else {
-    Serial.print("Starting Web Server at ");
     sayBaloon("Starting Web Server at ");
-    Serial.println(WiFi.localIP());
     sayBaloon(IpAddress2String(WiFi.localIP()));
 
     String api_url = "https://api.etherscan.io/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=NQCE1PBYQ4G3BVUENV2A1H8KVQ1AC81Z5U";
@@ -221,7 +203,6 @@ void setupMode() {
   delay(100);
   int n = WiFi.scanNetworks();
   delay(100);
-  Serial.println("");
   sayBaloon("");
   for (int i = 0; i < n; ++i) {
     ssidList += "<option value=\"";
@@ -238,11 +219,8 @@ void setupMode() {
   // WiFi.softAP(const char* ssid, const char* passphrase = NULL, int channel = 1, int ssid_hidden = 0);
   // dnsServer.start(53, "*", apIP);
   startWebServer();
-  Serial.print("Starting Access Point at \"");
-  sayBaloon("Starting Access Point at \"");
-  Serial.print(apSSID);
+  sayBaloon("AP at \"");
   sayBaloon(apSSID);
-  Serial.println("\"");
   sayBaloon("\"");
 }
 
