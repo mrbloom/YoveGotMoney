@@ -66,13 +66,9 @@ String IpAddress2String(const IPAddress& ipAddress)
 boolean restoreConfig() {
   wifi_ssid = preferences.getString("WIFI_SSID");
   wifi_password = preferences.getString("WIFI_PASSWD");
-  Serial.print("WIFI-SSID: ");
   M5.Lcd.print("WIFI-SSID: ");
-  Serial.println(wifi_ssid);
   M5.Lcd.println(wifi_ssid);
-  Serial.print("WIFI-PASSWD: ");
   M5.Lcd.print("WIFI-PASSWD: ");
-  Serial.println(wifi_password);
   M5.Lcd.println(wifi_password);
   WiFi.begin(wifi_ssid.c_str(), wifi_password.c_str());
 
@@ -85,22 +81,17 @@ boolean restoreConfig() {
 
 boolean checkConnection() {
   int count = 0;
-  Serial.print("Waiting for Wi-Fi connection");
   M5.Lcd.print("Waiting for Wi-Fi connection");
   while ( count < 30 ) {
     if (WiFi.status() == WL_CONNECTED) {
-      Serial.println();
       M5.Lcd.println();
-      Serial.println("Connected!");
       M5.Lcd.println("Connected!");
       return (true);
     }
     delay(500);
-    Serial.print(".");
     M5.Lcd.print(".");
     count++;
   }
-  Serial.println("Timed out.");
   M5.Lcd.println("Timed out.");
   return false;
 }
@@ -145,9 +136,7 @@ char* jsonParse(String& json,char* field){
 
 void startWebServer() {
   if (settingMode) {
-    Serial.print("Starting Web Server at ");
     M5.Lcd.print("Starting Web Server at ");
-    Serial.println(WiFi.softAPIP());
     M5.Lcd.println(WiFi.softAPIP());
     webServer.on("/settings", []() {
       String s = "<h1>Wi-Fi Settings</h1><p>Please enter your password by selecting the SSID.</p>";
@@ -158,25 +147,18 @@ void startWebServer() {
     });
     webServer.on("/setap", []() {
       String ssid = urlDecode(webServer.arg("ssid"));
-      Serial.print("SSID: ");
       M5.Lcd.print("SSID: ");
-      Serial.println(ssid);
       M5.Lcd.println(ssid);
       String pass = urlDecode(webServer.arg("pass"));
-      Serial.print("Password: ");
       M5.Lcd.print("Password: ");
-      Serial.println(pass);
       M5.Lcd.println(pass);
-      Serial.println("Writing SSID to EEPROM...");
       M5.Lcd.println("Writing SSID to EEPROM...");
 
       // Store wifi config
-      Serial.println("Writing Password to nvr...");
       M5.Lcd.println("Writing Password to nvr...");
       preferences.putString("WIFI_SSID", ssid);
       preferences.putString("WIFI_PASSWD", pass);
 
-      Serial.println("Write nvr done!");
       M5.Lcd.println("Write nvr done!");
       String s = "<h1>Setup complete.</h1><p>device will be connected to \"";
       s += ssid;
@@ -191,9 +173,7 @@ void startWebServer() {
     });
   }
   else {
-    Serial.print("Starting Web Server at ");
     M5.Lcd.print("Starting Web Server at ");
-    Serial.println(WiFi.localIP());
     M5.Lcd.println(WiFi.localIP());
 
     String api_url = "https://api.etherscan.io/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=NQCE1PBYQ4G3BVUENV2A1H8KVQ1AC81Z5U";
@@ -238,7 +218,6 @@ void setupMode() {
   delay(100);
   int n = WiFi.scanNetworks();
   delay(100);
-  Serial.println("");
   M5.Lcd.println("");
   for (int i = 0; i < n; ++i) {
     ssidList += "<option value=\"";
@@ -255,11 +234,8 @@ void setupMode() {
   // WiFi.softAP(const char* ssid, const char* passphrase = NULL, int channel = 1, int ssid_hidden = 0);
   // dnsServer.start(53, "*", apIP);
   startWebServer();
-  Serial.print("Starting Access Point at \"");
   M5.Lcd.print("Starting Access Point at \"");
-  Serial.print(apSSID);
   M5.Lcd.print(apSSID);
-  Serial.println("\"");
   M5.Lcd.println("\"");
 }
 
