@@ -3,21 +3,10 @@
 #include <ESPmDNS.h>
 #include <WiFiClient.h>
 #include "WebServer.h"
-#include <HTTPClient.h>
 #include <Preferences.h>
-#include <JsonArray.h>
-#include <JsonHashTable.h>
-#include <JsonObjectBase.h>
-#include <JsonParser.h>
 
-#include <Avatar.h>
-
-using namespace m5avatar;
-
-Avatar avatar;
-
-const IPAddress apIP(192, 168, 1, 196);
-const char* apSSID = "Magnitik";
+const IPAddress apIP(192, 168, 4, 1);
+const char* apSSID = "M5STACK_SETUP";
 boolean settingMode;
 String ssidList;
 String wifi_ssid;
@@ -28,7 +17,6 @@ WebServer webServer(80);
 
 // wifi config store
 Preferences preferences;
-
 
 void setup() {
   m5.begin();
@@ -44,24 +32,13 @@ void setup() {
   }
   settingMode = true;
   setupMode();
-
 }
 
 void loop() {
   if (settingMode) {
   }
   webServer.handleClient();
-
 }
-
-String IpAddress2String(const IPAddress& ipAddress)
-{
-  return String(ipAddress[0]) + String(".") +\
-  String(ipAddress[1]) + String(".") +\
-  String(ipAddress[2]) + String(".") +\
-  String(ipAddress[3])  ; 
-}
-
 
 boolean restoreConfig() {
   wifi_ssid = preferences.getString("WIFI_SSID");
@@ -76,9 +53,9 @@ boolean restoreConfig() {
   M5.Lcd.println(wifi_password);
   WiFi.begin(wifi_ssid.c_str(), wifi_password.c_str());
 
-  if (wifi_ssid.length() > 0) {
+  if(wifi_ssid.length() > 0) {
     return true;
-  } else {
+} else {
     return false;
   }
 }
@@ -103,44 +80,6 @@ boolean checkConnection() {
   Serial.println("Timed out.");
   M5.Lcd.println("Timed out.");
   return false;
-}
-
-String payload(String api_url){
-  try
-    {
-      HTTPClient http;
-      http.begin(api_url);
-      int httpCode = http.GET();                                        //Make the request
-
-      if (httpCode > 0) { //Check for the returning code
-        M5.Lcd.println("PAYLOAD");
-        String payload = http.getString();
-        return payload;
-      }
-      else {
-        M5.Lcd.print("Error on HTTP request");
-      }
-
-      http.end(); //Free the resources
-    }
-    catch (...)
-    {
-      M5.Lcd.print("Get Data Error");
-    }
-}
-
-char* jsonParse(String& json,char* field){
-    JsonParser<32> parser;
-    char str[2000];
-    json.toCharArray(str, 2000);    
-    JsonHashTable hashTable = parser.parseHashTable(str);    
-    if (!hashTable.success())    {
-        return "";
-    }
-    else
-    {
-      return hashTable.getString(field);
-    }
 }
 
 void startWebServer() {
@@ -195,29 +134,9 @@ void startWebServer() {
     M5.Lcd.print("Starting Web Server at ");
     Serial.println(WiFi.localIP());
     M5.Lcd.println(WiFi.localIP());
-
-    String api_url = "https://api.etherscan.io/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=NQCE1PBYQ4G3BVUENV2A1H8KVQ1AC81Z5U";
-    String json = payload(api_url);
-    char* balance = jsonParse(json,"result");  
-    M5.Lcd.println("balance");
-    M5.Lcd.println(balance);
-//      M5.update();
-//      avatar.setSpeechText(balance);
-//      avatar.setMouthOpenRatio(0.7);
-//      delay(1200);
-//      avatar.setMouthOpenRatio(0);
-//    }
-
-    M5.Lcd.println(json);
-    
-
-    String api_url_btc = "https://api.blockcypher.com/v1/btc/main/addrs/1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD/balance";
-    String payload_str_btc = payload(api_url_btc); 
-    M5.Lcd.println(payload_str_btc);
-
     webServer.on("/", []() {
-      String s = "<h1>WIFI Settings</h1><p><a href=\"/reset\">Reset Wifi</a></p>";
-      webServer.send(200, "text/html", makePage("Wifii Server", s));
+      String s = "<h1>STA mode</h1><p><a href=\"/reset\">Reset Wi-Fi Settings</a></p>";
+      webServer.send(200, "text/html", makePage("STA mode", s));
     });
     webServer.on("/reset", []() {
       // reset the wifi config
@@ -266,7 +185,6 @@ void setupMode() {
 String makePage(String title, String contents) {
   String s = "<!DOCTYPE html><html><head>";
   s += "<meta name=\"viewport\" content=\"width=device-width,user-scalable=0\">";
-  s += "<meta charset=\"UTF-8\">";
   s += "<title>";
   s += title;
   s += "</title></head><body>";

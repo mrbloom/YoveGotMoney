@@ -1,0 +1,36 @@
+{
+    "name": "M5Stack-Avatar", 
+    "keywords": [
+        "avatar", 
+        "lcd", 
+        "cute", 
+        "face", 
+        "m5stack"
+    ], 
+    "description": "An M5Stack library for rendering avatar faces", 
+    "repository": {
+        "type": "git", 
+        "url": "https://github.com/meganetaaan/m5stack-avatar.git"
+    }, 
+    "authors": [
+        {
+            "email": "ishikawa.s.1027@gmail.com", 
+            "url": "https://meganetaaan.github.io/", 
+            "maintainer": true, 
+            "name": "Shinya Ishikawa"
+        }
+    ], 
+    "license": "MIT", 
+    "dependencies": {
+        "name": "M5Stack", 
+        "version": ">=0.2.0"
+    }, 
+    "version": "0.7.1", 
+    "frameworks": [
+        "arduino"
+    ], 
+    "platforms": [
+        "espressif32"
+    ], 
+    "id": 4529
+}
