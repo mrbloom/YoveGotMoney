@@ -5,16 +5,27 @@
 #include "WebServer.h"
 #include <HTTPClient.h>
 #include <Preferences.h>
+<<<<<<< HEAD
 #include <JsonArray.h>
 #include <JsonHashTable.h>
 #include <JsonObjectBase.h>
 #include <JsonParser.h>
 
+=======
+>>>>>>> 68f7cdf20db53fc33a43c6dfda21e75f87531dea
 #include <Avatar.h>
 
 using namespace m5avatar;
 
 Avatar avatar;
+<<<<<<< HEAD
+=======
+
+//#include <JsonArray.h>
+//#include <JsonHashTable.h>
+//#include <JsonObjectBase.h>
+//#include <JsonParser.h>
+>>>>>>> 68f7cdf20db53fc33a43c6dfda21e75f87531dea
 
 const IPAddress apIP(192, 168, 1, 196);
 const char* apSSID = "Magnitik";
@@ -31,7 +42,9 @@ Preferences preferences;
 
 
 void setup() {
-  m5.begin();
+  M5.begin();
+  avatar.init();
+  
   preferences.begin("wifi-config");
 
   delay(10);
@@ -54,6 +67,7 @@ void loop() {
 
 }
 
+<<<<<<< HEAD
 String IpAddress2String(const IPAddress& ipAddress)
 {
   return String(ipAddress[0]) + String(".") +\
@@ -63,17 +77,28 @@ String IpAddress2String(const IPAddress& ipAddress)
 }
 
 
+=======
+void sayBaloon(String aStupidWasteOfResource){
+  char str[50];
+  aStupidWasteOfResource.toCharArray(str, 50);
+  avatar.setSpeechText(str);
+  avatar.setMouthOpenRatio(0.7);
+  delay(200);
+  avatar.setMouthOpenRatio(0);
+}
+
+>>>>>>> 68f7cdf20db53fc33a43c6dfda21e75f87531dea
 boolean restoreConfig() {
   wifi_ssid = preferences.getString("WIFI_SSID");
   wifi_password = preferences.getString("WIFI_PASSWD");
   Serial.print("WIFI-SSID: ");
-  M5.Lcd.print("WIFI-SSID: ");
+  sayBaloon("WIFI-SSID: ");
   Serial.println(wifi_ssid);
-  M5.Lcd.println(wifi_ssid);
+  sayBaloon(wifi_ssid);
   Serial.print("WIFI-PASSWD: ");
-  M5.Lcd.print("WIFI-PASSWD: ");
+  sayBaloon("WIFI-PASSWD: ");
   Serial.println(wifi_password);
-  M5.Lcd.println(wifi_password);
+  sayBaloon(wifi_password);
   WiFi.begin(wifi_ssid.c_str(), wifi_password.c_str());
 
   if (wifi_ssid.length() > 0) {
@@ -86,22 +111,20 @@ boolean restoreConfig() {
 boolean checkConnection() {
   int count = 0;
   Serial.print("Waiting for Wi-Fi connection");
-  M5.Lcd.print("Waiting for Wi-Fi connection");
+  sayBaloon("Waiting for Wi-Fi connection");
   while ( count < 30 ) {
     if (WiFi.status() == WL_CONNECTED) {
-      Serial.println();
-      M5.Lcd.println();
       Serial.println("Connected!");
-      M5.Lcd.println("Connected!");
+      sayBaloon("Connected!");
       return (true);
     }
     delay(500);
     Serial.print(".");
-    M5.Lcd.print(".");
+    sayBaloon(".");
     count++;
   }
   Serial.println("Timed out.");
-  M5.Lcd.println("Timed out.");
+  sayBaloon("Timed out.");
   return false;
 }
 
@@ -113,22 +136,23 @@ String payload(String api_url){
       int httpCode = http.GET();                                        //Make the request
 
       if (httpCode > 0) { //Check for the returning code
-        M5.Lcd.println("PAYLOAD");
+        sayBaloon("PAYLOAD");
         String payload = http.getString();
         return payload;
       }
       else {
-        M5.Lcd.print("Error on HTTP request");
+        sayBaloon("Error on HTTP request");
       }
 
       http.end(); //Free the resources
     }
     catch (...)
     {
-      M5.Lcd.print("Get Data Error");
+      sayBaloon("Get Data Error");
     }
 }
 
+<<<<<<< HEAD
 char* jsonParse(String& json,char* field){
     JsonParser<32> parser;
     char str[2000];
@@ -141,14 +165,22 @@ char* jsonParse(String& json,char* field){
     {
       return hashTable.getString(field);
     }
+=======
+String IpAddress2String(const IPAddress& ipAddress)
+{
+  return String(ipAddress[0]) + String(".") +\
+  String(ipAddress[1]) + String(".") +\
+  String(ipAddress[2]) + String(".") +\
+  String(ipAddress[3])  ; 
+>>>>>>> 68f7cdf20db53fc33a43c6dfda21e75f87531dea
 }
 
 void startWebServer() {
   if (settingMode) {
     Serial.print("Starting Web Server at ");
-    M5.Lcd.print("Starting Web Server at ");
+    sayBaloon("Starting Web Server at ");
     Serial.println(WiFi.softAPIP());
-    M5.Lcd.println(WiFi.softAPIP());
+    sayBaloon(IpAddress2String(WiFi.softAPIP()));
     webServer.on("/settings", []() {
       String s = "<h1>Wi-Fi Settings</h1><p>Please enter your password by selecting the SSID.</p>";
       s += "<form method=\"get\" action=\"setap\"><label>SSID: </label><select name=\"ssid\">";
@@ -159,25 +191,25 @@ void startWebServer() {
     webServer.on("/setap", []() {
       String ssid = urlDecode(webServer.arg("ssid"));
       Serial.print("SSID: ");
-      M5.Lcd.print("SSID: ");
+      sayBaloon("SSID: ");
       Serial.println(ssid);
-      M5.Lcd.println(ssid);
+      sayBaloon(ssid);
       String pass = urlDecode(webServer.arg("pass"));
       Serial.print("Password: ");
-      M5.Lcd.print("Password: ");
+      sayBaloon("Password: ");
       Serial.println(pass);
-      M5.Lcd.println(pass);
+      sayBaloon(pass);
       Serial.println("Writing SSID to EEPROM...");
-      M5.Lcd.println("Writing SSID to EEPROM...");
+      sayBaloon("Writing SSID to EEPROM...");
 
       // Store wifi config
       Serial.println("Writing Password to nvr...");
-      M5.Lcd.println("Writing Password to nvr...");
+      sayBaloon("Writing Password to nvr...");
       preferences.putString("WIFI_SSID", ssid);
       preferences.putString("WIFI_PASSWD", pass);
 
       Serial.println("Write nvr done!");
-      M5.Lcd.println("Write nvr done!");
+      sayBaloon("Write nvr done!");
       String s = "<h1>Setup complete.</h1><p>device will be connected to \"";
       s += ssid;
       s += "\" after the restart.";
@@ -192,11 +224,12 @@ void startWebServer() {
   }
   else {
     Serial.print("Starting Web Server at ");
-    M5.Lcd.print("Starting Web Server at ");
+    sayBaloon("Starting Web Server at ");
     Serial.println(WiFi.localIP());
-    M5.Lcd.println(WiFi.localIP());
+    sayBaloon(IpAddress2String(WiFi.localIP()));
 
     String api_url = "https://api.etherscan.io/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=NQCE1PBYQ4G3BVUENV2A1H8KVQ1AC81Z5U";
+<<<<<<< HEAD
     String json = payload(api_url);
     char* balance = jsonParse(json,"result");  
     M5.Lcd.println("balance");
@@ -210,14 +243,23 @@ void startWebServer() {
 
     M5.Lcd.println(json);
     
+=======
+    String payload_str = payload(api_url);  
+    sayBaloon(payload_str);
+>>>>>>> 68f7cdf20db53fc33a43c6dfda21e75f87531dea
 
     String api_url_btc = "https://api.blockcypher.com/v1/btc/main/addrs/1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD/balance";
     String payload_str_btc = payload(api_url_btc); 
-    M5.Lcd.println(payload_str_btc);
+    sayBaloon(payload_str_btc);
 
     webServer.on("/", []() {
+<<<<<<< HEAD
       String s = "<h1>WIFI Settings</h1><p><a href=\"/reset\">Reset Wifi</a></p>";
       webServer.send(200, "text/html", makePage("Wifii Server", s));
+=======
+      String s = "<h1>Reset</h1><p><a href=\"/reset\">Reset Wifi</a></p>";
+      webServer.send(200, "text/html", makePage("Reseting Server", s));
+>>>>>>> 68f7cdf20db53fc33a43c6dfda21e75f87531dea
     });
     webServer.on("/reset", []() {
       // reset the wifi config
@@ -239,7 +281,7 @@ void setupMode() {
   int n = WiFi.scanNetworks();
   delay(100);
   Serial.println("");
-  M5.Lcd.println("");
+  sayBaloon("");
   for (int i = 0; i < n; ++i) {
     ssidList += "<option value=\"";
     ssidList += WiFi.SSID(i);
@@ -256,11 +298,11 @@ void setupMode() {
   // dnsServer.start(53, "*", apIP);
   startWebServer();
   Serial.print("Starting Access Point at \"");
-  M5.Lcd.print("Starting Access Point at \"");
+  sayBaloon("Starting Access Point at \"");
   Serial.print(apSSID);
-  M5.Lcd.print(apSSID);
+  sayBaloon(apSSID);
   Serial.println("\"");
-  M5.Lcd.println("\"");
+  sayBaloon("\"");
 }
 
 String makePage(String title, String contents) {

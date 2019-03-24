@@ -1,6 +1,4 @@
-# M5Stack Get ETHPrice With WifiSetting
+Магнитик на холодильничек
 
-Dependence on example Wifi Setting to get ETH Price from Maicoin
-
-![alt 預覽](https://github.com/donma/M5StackWifiSettingWithETHPrice/blob/master/511085.jpg?raw=true)
-
+Скопипейстино с https://github.com/donma/M5StackWifiSettingWithETHPrice
+аватар с https://github.com/meganetaaan/m5stack-avatar/
